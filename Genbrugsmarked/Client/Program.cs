@@ -1,5 +1,5 @@
 using Genbrugsmarked;
-using Genbrugsmarked.Models;
+using Core;
 using Genbrugsmarked.Repositories;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -21,17 +21,6 @@ namespace Genbrugsmarked
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-            
-
-
-            var ordertest = new Order
-            {
-                User = "magnustest"
-            };
-
-            var orderrepository = new Orderrepository();
-
-            orderrepository.AddOrder(ordertest);
 
 
 

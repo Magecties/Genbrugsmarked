@@ -1,11 +1,10 @@
 ﻿using MongoDB.Driver;
 using MongoDB.Bson;
 using MongoDB.Driver.Core.Configuration;
-using Genbrugsmarked;
 using System.Net.NetworkInformation;
+using Core;
 
-
-namespace Genbrugsmarked.Repositories
+namespace Serverapi.repositories
 {
 
     public class Orderrepository

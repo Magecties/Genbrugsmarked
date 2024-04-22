@@ -2,8 +2,7 @@
 using MongoDB.Bson;
 
 
-
-namespace Genbrugsmarked.Models
+namespace Core
 {
     public class Post
     {

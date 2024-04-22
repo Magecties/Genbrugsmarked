@@ -1,4 +1,6 @@
-
+using Serverapi;
+using Core;
+using Serverapi.repositories;
 
 namespace Serverapi
 {
@@ -22,6 +24,19 @@ namespace Serverapi
 
 
             app.MapControllers();
+
+            
+
+
+            var ordertest = new Order
+            {
+                User = "magnustest"
+            };
+
+            var orderrepository = new Orderrepository();
+
+            orderrepository.AddOrder(ordertest);
+
 
             app.Run();
         }
