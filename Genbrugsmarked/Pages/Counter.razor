@@ -1,13 +1,11 @@
 ﻿@using Genbrugsmarked;
 @using Core;
-@using Genbrugsmarked.Repositories;
 @using Microsoft.AspNetCore.Components.Web;
 @using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 @using MongoDB;
 @using MongoDB.Driver;
 @using MongoDB.Bson;
 @using MongoDB.Driver.Core.Configuration;
-
 @page "/counter"
 
 <PageTitle>Counter</PageTitle>
@@ -23,17 +21,7 @@
     {
 
 
-        var ordertest = new Order
-            {
-                User = "magnustest"
-            };
-
-        var orderrepository = new Orderrepository();
-         
-
-        orderrepository.AddOrder(ordertest);
-            
-        Console.WriteLine(ordertest);
+        
         
     }
     // hey hey hey

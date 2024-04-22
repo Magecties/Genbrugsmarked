@@ -25,8 +25,18 @@ namespace Serverapi
 
             app.MapControllers();
 
-            
 
+            var posttest = new Post
+            {
+                Category = "mandeopmodebegynd",
+                Name = "test",
+                Price = 10,
+                status = "fuckjegvandtligeeurojackpotshithvornem"
+            };
+
+            var postrepository = new PostRepository();
+
+            postrepository.AddPost(posttest);
 
             var ordertest = new Order
             {
