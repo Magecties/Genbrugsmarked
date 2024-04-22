@@ -1,19 +1,40 @@
-﻿@page "/counter"
+﻿@using Genbrugsmarked;
+@using Genbrugsmarked.Models;
+@using Genbrugsmarked.Repositories;
+@using Microsoft.AspNetCore.Components.Web;
+@using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+@using MongoDB;
+@using MongoDB.Driver;
+@using MongoDB.Bson;
+@using MongoDB.Driver.Core.Configuration;
+
+@page "/counter"
 
 <PageTitle>Counter</PageTitle>
 
 <h1>Counter</h1>
 
-<p role="status">Current count: @currentCount</p>
-
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<button class="btn btn-primary" @onclick="insertdata">Click me</button>
 
 @code {
-    private int currentCount = 1;
 
-    private void IncrementCount()
+
+    private void insertdata()
     {
-        currentCount++;
+
+
+        var ordertest = new Order
+            {
+                User = "magnustest"
+            };
+
+        var orderrepository = new Orderrepository();
+         
+
+        orderrepository.AddOrder(ordertest);
+            
+        Console.WriteLine(ordertest);
+        
     }
     // hey hey hey
 }
