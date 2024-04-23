@@ -7,7 +7,7 @@ using Core;
 namespace Serverapi.repositories
 {
 
-    public class UserRepository
+    public class RoomRepository
     {
 
         const string connectionstring = "mongodb+srv://magnusbbb:genbrugskoden76534@genbrugssystem.w46cr48.mongodb.net/";
@@ -18,29 +18,28 @@ namespace Serverapi.repositories
 
         IMongoDatabase database;
 
-        IMongoCollection<User> collection;
+        IMongoCollection<Room> collection;
 
 
 
-        public UserRepository()
+        public RoomRepository()
         {
 
             mongoClient = new MongoClient(connectionstring);
 
             database = mongoClient.GetDatabase("genbrugssystem");
 
-            collection = database.GetCollection<User>("Users");
+            collection = database.GetCollection<Room>("Rooms");
 
         }
 
-        public void AddUser(User newuser)
+        public void AddRoom(Room newroom)
         {
-            collection.InsertOne(newuser);
+            collection.InsertOne(newroom);
         }
 
     }
 }
-
 
 
 

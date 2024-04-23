@@ -6,23 +6,23 @@ using Serverapi.Repositories;
 
 namespace Serverapi.Controllers
 {
-    public class Roomcontroller
+    public class Usercontroller
     {
 
         [ApiController]
-        [Route("api/rooms")]
-        public class RoomController : ControllerBase
+        [Route("api/users")]
+        public class UserController : ControllerBase
         {
-            private IRoomRepository mRepo;
+            private IUserRepository mRepo;
 
-            public RoomController(IRoomRepository repo)
+            public UserController(IUserRepository repo)
             {
                 mRepo = repo;
             }
 
             [HttpGet]
             [Route("getall")]
-            public IEnumerable<Room> GetAll()
+            public IEnumerable<User> GetAll()
             {
                 return mRepo.GetAll();
             }
@@ -31,7 +31,7 @@ namespace Serverapi.Controllers
 
             [HttpPost]
             [Route("add")]
-            public void AddItem(Room product)
+            public void AddItem(User product)
             {
                 mRepo.AddItem(product);
             }
@@ -45,7 +45,7 @@ namespace Serverapi.Controllers
 
             [HttpPut]
             [Route("update")]
-            public void UpdateItem(Room product)
+            public void UpdateItem(User product)
             {
                 mRepo.UpdateItem(product);
             }
