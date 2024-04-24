@@ -6,8 +6,7 @@ using Serverapi.Repositories;
 
 namespace Serverapi.Controllers
 {
-    public class Roomcontroller
-    {
+    
 
         [ApiController]
         [Route("api/rooms")]
@@ -55,5 +54,5 @@ namespace Serverapi.Controllers
     }
 
 
-}
+
 

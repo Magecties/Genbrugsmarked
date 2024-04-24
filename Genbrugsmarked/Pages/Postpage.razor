@@ -9,10 +9,10 @@
     <thead>
         <tr>
             <th>Name</th>
-            <th>Amount</th>
+            <th>Category</th>
             <th>Price</th>
-            <th>Shop</th>
-            <th>Done</th>
+            <th>Status</th>
+            <th>Room name</th>
         </tr>
     </thead>
     <tbody>
@@ -24,12 +24,15 @@
                 <td>@item.Price</td>
                 <td>@item.status</td>
                 <td>
-                  
+                    @if (item.Room != null)
+                    {
+                        @item.Room.Name
+                    }
+                    else
+                    {
+                        <span>N/A</span>
+                    }
                 </td>
-                <td>
-                    
-                </td>
-                
             </tr>
         }
         

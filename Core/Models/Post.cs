@@ -16,5 +16,7 @@ namespace Core
         public string Category { get; set; }
 
         public string status { get; set; }
+
+        public Room Room { get; set; }
     }
 }

@@ -9,6 +9,8 @@ namespace Core
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public ObjectId Id { get; set; }
+
+        public int roomid { get; set; }
         public string Name { get; set; }
         
     }

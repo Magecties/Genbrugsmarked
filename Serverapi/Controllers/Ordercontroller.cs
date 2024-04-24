@@ -6,8 +6,7 @@ using Serverapi.Repositories;
 
 namespace Serverapi.Controllers
 {
-    public class Ordercontroller
-    {
+    
        
         [ApiController]
         [Route("api/orders")]
@@ -55,5 +54,5 @@ namespace Serverapi.Controllers
     }
 
 
-}
+
 
