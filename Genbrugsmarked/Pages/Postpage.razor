@@ -3,8 +3,24 @@
 @using Core;
 @inject NavigationManager NavManager
 
-
 <h1 class="mb-3 mt-3">Post List</h1>
+
+<!-- input til sort for navn -->
+<div class="mb-3">
+    <input type="text" placeholder="Enter name" @bind="nameFilter" />
+
+    <!-- dropdown menu til kategori -->
+    <label for="categorybox">Category</label>
+    <InputSelect id="categorybox" @bind-Value="selectedCategory">
+        <option value="">All</option>
+        <option value="Clothing">Clothing</option>
+        <option value="It-Equipment">It-Equipment</option>
+        <option value="Books">Books</option>
+    </InputSelect>
+
+    <button @onclick="FilterAndSort">Filter & Sort</button>
+</div>
+
 <table class="table table-striped">
     <thead>
         <tr>
@@ -16,7 +32,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in postlisten?? new Post[0])
+        @foreach (var item in filteredAndSortedPosts ?? new Post[0])
         {
             <tr>
                 <td>@item.Name</td>
@@ -35,85 +51,65 @@
                 </td>
             </tr>
         }
-        
     </tbody>
 </table>
 
-
-
 <img src="busy.gif" style="display:@busyDisplayStyle" />
 
-<div>
-  
-</div>
-
-
 @code {
-
-
-
-    // Style for billede der vises når data hentes. Se
-    // OnInitializedAsync().
     private string busyDisplayStyle = "none";
+    private Post[] postListCopy; // Copy of the original post list
+    private Post[] filteredAndSortedPosts = new Post[0]; // Filtered and sorted posts
+    private string nameFilter = "";
+    private string selectedCategory = "";
 
-    // Objekt for formen der vises modal
-    private Post post = new Post();
-
-    // container for listen
-    private Post[]? postlisten = new Post[0];
-
-    // kontekst for formen
-    private EditContext? aEditContext;
-
-    // adresse på server
     private string serverUrl = "https://localhost:7235";
-    /*
-    protected override void OnInitialized()
-    {
-        aEditContext = new EditContext(Post);
-    }
-    /*
-    public async Task HandleValidSubmit()
-    {
-        await AddPostItem();
-        addDialog.Close();
-    }
-    */
-    /*
-    private async Task AddPostItem()
-    {
-        await Http.PostAsJsonAsync<Post>($"{serverUrl}/api/posts/add", Post);
-        Console.WriteLine("Klient: add " + Post.Name + " " + Post.category);
-        postlisten = await Http.GetFromJsonAsync<Post[]>($"{serverUrl}/api/posts/getall");
-        postlisten = new(); // clear fields in form
-    }
-    */
-    public string boolAsText(bool b)
-    {
-        return b ? "YES" : "NO";
-    }
 
     protected override async Task OnInitializedAsync()
     {
-        busyDisplayStyle = "block"; // tænd busy
-        postlisten = await Http.GetFromJsonAsync<Post[]>($"{serverUrl}/api/posts/getall");
-        busyDisplayStyle = "none"; // sluk busy
+        busyDisplayStyle = "block";
+        await LoadPosts(); // Load posts initially
+        busyDisplayStyle = "none";
+    }
+
+    private async Task LoadPosts()
+    {
+        var posts = await Http.GetFromJsonAsync<Post[]>($"{serverUrl}/api/posts/getall");
+        postListCopy = posts.ToArray(); // Make a copy of the original posts
+        filteredAndSortedPosts = posts; // Initialize filteredAndSortedPosts with all posts
     }
 
     private async Task DeletePostItem(Post item)
     {
         await Http.DeleteAsync($"{serverUrl}/api/posts/delete/{item.Id}");
-
-        postlisten = await Http.GetFromJsonAsync<Post[]>($"{serverUrl}/api/posts/getall");
-
+        await LoadPosts(); // Reload posts after deletion
     }
 
     private async Task UpdatePostItem(Post item)
     {
         //item.Done = !item.Done;
         await Http.PutAsJsonAsync<Post>($"{serverUrl}/api/posts/update", item);
+        await LoadPosts(); // Reload posts after update
     }
-    
-   // private ModalDialog? addDialog { get; set; }
-}
 
+    private void FilterAndSort()
+    {
+        // Filter posts by name
+        var filteredPosts = postListCopy
+            .Where(post => string.IsNullOrWhiteSpace(nameFilter) || post.Name.Contains(nameFilter, StringComparison.OrdinalIgnoreCase));
+
+        // Filter posts by category
+        if (!string.IsNullOrEmpty(selectedCategory) && selectedCategory != "All")
+        {
+            filteredPosts = filteredPosts.Where(post => post.Category.Equals(selectedCategory, StringComparison.OrdinalIgnoreCase));
+        }
+
+        // Update filteredAndSortedPosts with the filtered posts
+        filteredAndSortedPosts = filteredPosts.ToArray();
+
+        // Sort filtered posts by name
+        filteredAndSortedPosts = filteredAndSortedPosts.OrderBy(post => post.Name).ToArray();
+
+        
+    }
+}
