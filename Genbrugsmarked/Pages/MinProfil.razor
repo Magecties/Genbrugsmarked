@@ -8,9 +8,53 @@
 
 <h3>My Profile</h3>
 
+
+
 @if (user != null)
 {
     <button @onclick="Logout">Logout</button>
+     
+    <p>Add a post</p>
+
+    <EditForm EditContext="@aEditContext" OnSubmit="@handleSubmit" class="row p-3">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="col-md-12 mb-3">
+            <label for="Name">Name</label>
+            <InputText id="Name" @bind-Value="aPost.Name" class="form-control" />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="Price">Price</label>
+            <InputNumber id="Price" @bind-Value="aPost.Price" class="form-control" />
+        </div>
+        <!-- <div class="col-md-6 mb-3">
+            <label for="PublishedDate">Published Date</label>
+            <InputDate id="PublishedDate" @bind-Value="aProduct.PublishedDate" class="form-control" />
+        </div> -->
+        <div class="col-md-12 mb-3">
+            <label for="Description">Description</label>
+            <InputTextArea id="Description" @bind-Value="aPost.Description" class="form-control" />
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label for="IsActive">Is Active</label>
+            <InputCheckbox id="IsActive" @bind-Value="aPost.IsActive" class="form-check-input" />
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label for="Room">Room</label>
+            <InputSelect id="Room" @bind-Value="aPost.Room" class="form-control">
+                @foreach (var anOption in Rooms)
+                {
+                    <option value="@anOption">@anOption</option>
+                }
+            </InputSelect>
+        </div>
+
+        <div class="col-12 mb-3">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </EditForm>
 }
 
 else
@@ -38,5 +82,21 @@ else
     private void NavigateToLogin()
     {
         navigationManager.NavigateTo("/login");
+    }
+
+    private string[] Rooms = { "3.13", "3.14", "3.15", "3.16" };
+
+    private Core.Post aPost = new Core.Post();
+
+    private EditContext? aEditContext;
+
+    protected override void OnInitialized()
+    {
+        aEditContext = new EditContext(aPost);
+    }
+
+    private void handleSubmit()
+    {
+
     }
 }

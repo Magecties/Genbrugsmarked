@@ -7,6 +7,8 @@ namespace Genbrugsmarked.Util
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
+
+        public int Id { get; set; }
         public string Name { get; set; }
         public int Price { get; set; }
         public string Room { get; set; }

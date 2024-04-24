@@ -28,7 +28,7 @@ namespace Serverapi
 
             var posttest = new Post
             {
-                Category = "mandeopmodebegynd",
+                Room = "mandeopmodebegynd",
                 Name = "test",
                 Price = 10,
                 status = "fuckjegvandtligeeurojackpotshithvornem"
