@@ -1,0 +1,73 @@
+﻿@page "/login"
+@using Core
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject NavigationManager navigationManager
+
+<h1>Login</h1>
+
+<EditForm EditContext="@editContext" OnSubmit="@HandleSubmit" class="row p-3">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="col-md-6 mb-3">
+        <label for="Name">Brugernavn</label>
+        <InputText id="Name" @bind-Value="currentUser.UserName" placeHolder="Indtast brugernavn..." class="form-control" />
+    </div>
+    <div class="col-md-6 mb-3">
+        <label for="password">Password</label>
+        <InputText type="password" placeholder="Indtast password..." id="password" @bind-Value="currentUser.Password" class="form-control" />
+    </div>
+
+    <div class="col-12 mb-3">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</EditForm>
+
+<button @onclick="NavigateBack">Back to Homepage</button>
+
+@code {
+    private User[] users = {
+        new User { UserName = "sælger", Password="1234", Role="sælger"},
+        new User { UserName = "køber", Password="4321", Role="køber"},
+    };
+
+    private User currentUser = new User();
+    private EditContext editContext;
+
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(currentUser);
+    }
+
+    private async Task HandleSubmit()
+    {
+        var validUser = ValidLogin(currentUser.UserName, currentUser.Password);
+        if (validUser != null)
+        {
+            await localStorage.SetItemAsync("currentUser", validUser);
+            navigationManager.NavigateTo("/", true);
+        }
+        else
+        {
+            // Handle invalid login
+        }
+    }
+
+    private User ValidLogin(string username, string password)
+    {
+        foreach (var user in users)
+        {
+            if (user.UserName.Equals(username) && user.Password.Equals(password))
+            {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    private void NavigateBack()
+    {
+        navigationManager.NavigateTo("/");
+    }
+}
+
+            

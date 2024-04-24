@@ -1,0 +1,114 @@
+﻿@page "/minprofil"
+@using Core;
+@inject Blazored.LocalStorage.ILocalStorageService localStore
+@inject NavigationManager navigationManager
+@inject HttpClient Http
+@using System.Collections.Generic
+
+<h3>My Profile</h3>
+
+@if (user != null)
+{
+    <button @onclick="AddNewPost">Add New Post</button>
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Room</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var post in posts)
+            {
+                <tr>
+                    <td>@post.Name</td>
+                    <td>@post.Room</td>
+                    <td>@(post.IsActive ? "Active" : "Inactive")</td>
+                    <td>
+                        <button @onclick="() => EditPost(post)">Edit</button>
+                        <button @onclick="() => DeletePost(post)">Delete</button>
+                        <button @onclick="() => ToggleStatus(post)">Toggle Status</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <button @onclick="Logout">Logout</button>
+}
+else
+{
+    <p>Please log in.</p>
+    <button @onclick="NavigateToLogin">Login</button>
+}
+
+@code {
+    private string serverUrl = "https://localhost:7060";
+    private User? user;
+    private List<Post> posts = new List<Post>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await localStore.GetItemAsync<User>("currentUser");
+
+    }
+
+    private async Task Logout()
+    {
+        await localStore.RemoveItemAsync("currentUser");
+        navigationManager.NavigateTo("/login");
+    }
+
+        private void NavigateToLogin()
+        {
+            navigationManager.NavigateTo("/login");
+        }
+    
+
+    private async Task LoadPosts()
+    {
+        // Make a request to your backend API to fetch posts tied to the user's room
+        // Example:
+         var response = await Http.GetFromJsonAsync<List<Post>>($"{serverUrl}/posts?roomId={user.RoomId}");
+         posts = response ?? new List<Post>();
+    }
+
+    private async Task AddNewPost()
+    {
+        // Navigate to the add post page or modal
+        navigationManager.NavigateTo("addpost");
+    }
+
+    private async Task EditPost(Post post)
+    {
+        // Navigate to the edit post page or modal with the post ID
+        navigationManager.NavigateTo($"editpost/{post.Id}");
+    }
+
+    private async Task DeletePost(Post post)
+    {
+        // Make a request to your backend API to delete the post
+        // Example:
+         var response = await Http.DeleteAsync($"{serverUrl}/posts/{post.Id}");
+         if (response.IsSuccessStatusCode)
+         {
+             posts.Remove(post);
+         }
+    }
+
+    private async Task ToggleStatus(Post post)
+    {
+        // Toggle the status of the post between active and inactive
+        post.IsActive = !post.IsActive;
+
+        // Make a request to your backend API to update the post status
+        // Example:
+        var response = await Http.PutAsJsonAsync($"{serverUrl}/posts/{post.Id}", post);
+        if (!response.IsSuccessStatusCode)
+         {
+             // Revert the status change if the request fails
+             post.IsActive = !post.IsActive;
+         }
+    }
+}

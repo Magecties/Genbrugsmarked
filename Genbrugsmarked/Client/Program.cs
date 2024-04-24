@@ -7,6 +7,7 @@ using MongoDB.Driver;
 using MongoDB.Bson;
 using MongoDB.Driver.Core.Configuration;
 using System.Net.NetworkInformation;
+using Blazored.LocalStorage;
 
 namespace Genbrugsmarked
 {
@@ -20,7 +21,7 @@ namespace Genbrugsmarked
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-
+            builder.Services.AddBlazoredLocalStorage();
 
 
             await builder.Build().RunAsync();

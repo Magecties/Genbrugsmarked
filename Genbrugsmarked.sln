@@ -4,14 +4,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Genbrugsmarked", "Genbrugsmarked\Genbrugsmarked.csproj", "{1D77E6F1-7166-4A78-8E9D-5465B023474A}"
-	ProjectSection(ProjectDependencies) = postProject
-		{8F81EA5D-05B6-4E2C-A290-6C691EEAE16D} = {8F81EA5D-05B6-4E2C-A290-6C691EEAE16D}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serverapi", "Serverapi\Serverapi.csproj", "{4C22D2EB-3E69-4C54-9F8A-EA4B9CD3D77E}"
-	ProjectSection(ProjectDependencies) = postProject
-		{8F81EA5D-05B6-4E2C-A290-6C691EEAE16D} = {8F81EA5D-05B6-4E2C-A290-6C691EEAE16D}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{8F81EA5D-05B6-4E2C-A290-6C691EEAE16D}"
 EndProject
