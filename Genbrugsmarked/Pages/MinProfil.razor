@@ -1,4 +1,5 @@
 ﻿@page "/minprofil"
+@using Genbrugsmarked.Util;
 @using Core;
 @inject Blazored.LocalStorage.ILocalStorageService localStore
 @inject NavigationManager navigationManager
@@ -9,34 +10,50 @@
 
 @if (user != null)
 {
-    <button @onclick="AddNewPost">Add New Post</button>
-    <table>
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Room</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var post in posts)
-            {
-                <tr>
-                    <td>@post.Name</td>
-                    <td>@post.Room</td>
-                    <td>@(post.IsActive ? "Active" : "Inactive")</td>
-                    <td>
-                        <button @onclick="() => EditPost(post)">Edit</button>
-                        <button @onclick="() => DeletePost(post)">Delete</button>
-                        <button @onclick="() => ToggleStatus(post)">Toggle Status</button>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
     <button @onclick="Logout">Logout</button>
+
+    <EditForm EditContext="@aEditContext" OnSubmit="@handleSubmit" class="row p-3">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="col-md-12 mb-3">
+            <label for="Name">Name</label>
+            <InputText id="Name" @bind-Value="aPost.Name" class="form-control" />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="Price">Price</label>
+            <InputNumber id="Price" @bind-Value="aPost.Price" class="form-control" />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="Room">Room</label>
+            <InputDate id="Room" @bind-Value="aPost.Room" class="form-control" />
+        </div>
+        <div class="col-md-12 mb-3">
+            <label for="Description">Description</label>
+            <InputTextArea id="Description" @bind-Value="aPost.Description" class="form-control" />
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label for="IsActive">Is Active</label>
+            <InputCheckbox id="IsActive" @bind-Value="aPost.IsActive" class="form-check-input" />
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label for="Room">Room</label>
+            <InputSelect id="Room" @bind-Value="aPost.Room" class="form-control">
+                @foreach (var anOption in categories)
+                {
+                    <option value="@anOption">@anOption</option>
+                }
+            </InputSelect>
+        </div>
+
+        <div class="col-12 mb-3">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </EditForm>
 }
+
+
 else
 {
     <p>Please log in.</p>
@@ -46,7 +63,6 @@ else
 @code {
     private string serverUrl = "https://localhost:7060";
     private User? user;
-    private List<Post> posts = new List<Post>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -60,55 +76,26 @@ else
         navigationManager.NavigateTo("/login");
     }
 
-        private void NavigateToLogin()
-        {
-            navigationManager.NavigateTo("/login");
-        }
-    
-
-    private async Task LoadPosts()
+    private void NavigateToLogin()
     {
-        // Make a request to your backend API to fetch posts tied to the user's room
-        // Example:
-         var response = await Http.GetFromJsonAsync<List<Post>>($"{serverUrl}/posts?roomId={user.RoomId}");
-         posts = response ?? new List<Post>();
+        navigationManager.NavigateTo("/login");
     }
 
-    private async Task AddNewPost()
+    private string[] categories = { "Computer", "Audio", "Video", "Other" };
+
+
+    private Util.Post aPost = new Util.Post();
+
+    private EditContext? aEditContext;
+
+    protected override void OnInitialized()
     {
-        // Navigate to the add post page or modal
-        navigationManager.NavigateTo("addpost");
+        aEditContext = new EditContext(aPost);
     }
 
-    private async Task EditPost(Post post)
+    private void handleSubmit()
     {
-        // Navigate to the edit post page or modal with the post ID
-        navigationManager.NavigateTo($"editpost/{post.Id}");
-    }
 
-    private async Task DeletePost(Post post)
-    {
-        // Make a request to your backend API to delete the post
-        // Example:
-         var response = await Http.DeleteAsync($"{serverUrl}/posts/{post.Id}");
-         if (response.IsSuccessStatusCode)
-         {
-             posts.Remove(post);
-         }
     }
-
-    private async Task ToggleStatus(Post post)
-    {
-        // Toggle the status of the post between active and inactive
-        post.IsActive = !post.IsActive;
-
-        // Make a request to your backend API to update the post status
-        // Example:
-        var response = await Http.PutAsJsonAsync($"{serverUrl}/posts/{post.Id}", post);
-        if (!response.IsSuccessStatusCode)
-         {
-             // Revert the status change if the request fails
-             post.IsActive = !post.IsActive;
-         }
-    }
+   
 }
