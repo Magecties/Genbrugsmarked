@@ -6,8 +6,7 @@ using Serverapi.Repositories;
 
 namespace Serverapi.Controllers
 {
-    public class Postcontroller
-    {
+    
 
         [ApiController]
         [Route("api/posts")]
@@ -54,6 +53,4 @@ namespace Serverapi.Controllers
         }
     }
 
-
-}
 

@@ -1,6 +1,7 @@
 using Serverapi;
 using Core;
 using Serverapi.repositories;
+using Serverapi.Repositories;
 
 namespace Serverapi
 {
@@ -14,38 +15,32 @@ namespace Serverapi
 
             builder.Services.AddControllers();
 
-            var app = builder.Build();
+            builder.Services.AddSingleton<IOrderRepository, Orderrepository>();
+            builder.Services.AddSingleton<IpostRepository, PostRepository>();
+
+           
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("policy",
+                                  policy =>
+                                  {
+                                      policy.AllowAnyOrigin();
+                                      policy.AllowAnyMethod();
+                                      policy.AllowAnyHeader();
+                                  });
+            });
 
             // Configure the HTTP request pipeline.
+
+            var app = builder.Build();
 
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
 
-
+            app.UseCors("policy");
             app.MapControllers();
-
-
-            var posttest = new Post
-            {
-                Category = "mandeopmodebegynd",
-                Name = "test",
-                Price = 10,
-                status = "fuckjegvandtligeeurojackpotshithvornem"
-            };
-
-            var postrepository = new PostRepository();
-
-            postrepository.AddPost(posttest);
-
-            var ordertest = new Order
-            {
-                User = "magnustest"
-            };
-
-            var orderrepository = new Orderrepository();
-
-            orderrepository.AddOrder(ordertest);
 
 
             app.Run();
