@@ -45,7 +45,7 @@ namespace Serverapi
             app.UseCors("policy");
             app.MapControllers();
 
-            /*
+            
             //test og indsætte rooms og posts til data at arbejde med udkommenter alt fra her til inden app.run
             var newroom = new Room() { Name = "rygerummet", roomid = 1337};
             var roomrepo = new RoomRepository();
@@ -54,11 +54,14 @@ namespace Serverapi
 
             var posttest = new Post
             {
-                Category = "andenkat",
-                Name = "navn2",
-                Price = 10,
-                status = "fuckjegvandtligeeurojackpotshithvornem",
-                Room = newroom
+                Category = "books",
+                Name = "childbook1",
+                Price = 100,
+                status = "active",
+                Room = newroom,
+                description = "big fat children book for children maybe not adults",
+                img = ""
+                
             };
 
 
@@ -70,7 +73,7 @@ namespace Serverapi
             var newuser = new User() {Name = "jannefestival", user_email = "jannefestival@gamrmail.dk" };
             var userreoi = new UserRepository();
             userreoi.AddUser(newuser);
-            */
+            
             app.Run();
         }
     }

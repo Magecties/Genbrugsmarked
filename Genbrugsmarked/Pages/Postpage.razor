@@ -65,7 +65,12 @@
                             <p>Category: @selectedPost.Category</p>
                             <p>Price: @selectedPost.Price</p>
                             <p>Status: @selectedPost.status</p>
-                            <!-- Add more details as needed -->
+                            <p>Description: @selectedPost.description</p>
+                            <p>Image of post: @selectedPost.img</p>
+                            <img src="images/@selectedPost.img" alt="Image of post" />
+
+                           
+                           
                         </div>
                     </div>
                 </div>
@@ -80,6 +85,7 @@
 <img src="busy.gif" style="display:@busyDisplayStyle" />
 
 @code {
+
     private string busyDisplayStyle = "none";
     private Post[] postListCopy; // Copy of the original post list
     private Post[] filteredAndSortedPosts = new Post[0]; // Filtered and sorted posts
