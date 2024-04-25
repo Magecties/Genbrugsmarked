@@ -21,6 +21,17 @@
         {
             <tr>
                 <td>@item.User</td>
+                <td>@item.OrderId</td>
+                <td>
+                    @if (item.Posts != null)
+                    {
+                        @item.Posts
+                    }
+                    else
+                    {
+                        <span>N/A</span>
+                    }
+                </td>
                 <!-- Add other columns here as needed -->
             </tr>
         }
