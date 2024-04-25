@@ -11,7 +11,7 @@ namespace Serverapi.Repositories
         // findes sker ingenting
         void DeleteById(int id);
 
-        Order[] GetAll();
+        List<Order> GetAll();
 
 
         // Opdaterer element med Id = item.Id.

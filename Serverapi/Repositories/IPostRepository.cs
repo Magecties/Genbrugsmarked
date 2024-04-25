@@ -1,9 +1,11 @@
 ﻿using Core;
+using Serverapi.repositories;
 
 namespace Serverapi.Repositories
 {
     public interface IpostRepository
     {
+
         //Tildeler item en unik id og tilføjer den.
         void AddItem(Post item);
 
@@ -11,7 +13,7 @@ namespace Serverapi.Repositories
         // findes sker ingenting
         void DeleteById(int id);
 
-        Post[] GetAll();
+        List<Post> GetAll();
 
 
         // Opdaterer element med Id = item.Id.

@@ -1,0 +1,158 @@
+﻿@page "/postpage"
+@inject HttpClient Http;
+@using Core;
+@inject NavigationManager NavManager
+
+<h1 class="mb-3 mt-3">Post List</h1>
+
+<!-- input til sort for navn -->
+<div class="mb-3">
+    <input type="text" placeholder="Enter name" @bind="nameFilter" />
+
+    <!-- dropdown menu til kategori -->
+    <label for="categorybox">Category</label>
+    <InputSelect id="categorybox" @bind-Value="selectedCategory">
+        <option value="">All</option>
+        <option value="Clothing">Clothing</option>
+        <option value="It-Equipment">It-Equipment</option>
+        <option value="Books">Books</option>
+    </InputSelect>
+
+    <button @onclick="FilterAndSort">Filter & Sort</button>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th>Room name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in filteredAndSortedPosts ?? new Post[0])
+        {
+            <tr style="cursor: pointer;" @onclick="() => OpenModal(item)">
+                <td>@item.Name</td>
+                <td>@item.Category</td>
+                <td>@item.Price</td>
+                <td>@item.status</td>
+                <td>
+                    @if (item.Room != null)
+                    {
+                        @item.Room.Name
+                    }
+                    else
+                    {
+                        <span>N/A</span>
+                    }
+                </td>
+            </tr>
+        }
+
+        <!-- Modal -->
+        @if (selectedPost != null)
+        {
+            <div class="modal" style="display: block;">
+                <div class="modal-dialog">
+                    <!-- Add Bootstrap modal class -->
+                    <div class="modal-content">
+                        <span @onclick="CloseModal" class="close">&times;</span>
+                        <div class="modal-body">
+                            <h2>@selectedPost.Name</h2>
+                            <p>Category: @selectedPost.Category</p>
+                            <p>Price: @selectedPost.Price</p>
+                            <p>Status: @selectedPost.status</p>
+                            <!-- Add more details as needed -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+
+
+    </tbody>
+</table>
+
+<img src="busy.gif" style="display:@busyDisplayStyle" />
+
+@code {
+    private string busyDisplayStyle = "none";
+    private Post[] postListCopy; // Copy of the original post list
+    private Post[] filteredAndSortedPosts = new Post[0]; // Filtered and sorted posts
+    private string nameFilter = "";
+    private string selectedCategory = "";
+
+    private string serverUrl = "https://localhost:7235";
+
+    protected override async Task OnInitializedAsync()
+    {
+        busyDisplayStyle = "block";
+        await LoadPosts(); // Load posts initially
+        busyDisplayStyle = "none";
+    }
+
+    private async Task LoadPosts()
+    {
+        var posts = await Http.GetFromJsonAsync<Post[]>($"{serverUrl}/api/posts/getall");
+        postListCopy = posts.ToArray(); // Make a copy of the original posts
+        filteredAndSortedPosts = posts; // Initialize filteredAndSortedPosts with all posts
+    }
+
+    private async Task DeletePostItem(Post item)
+    {
+        await Http.DeleteAsync($"{serverUrl}/api/posts/delete/{item.Id}");
+        await LoadPosts(); // Reload posts after deletion
+    }
+
+    private async Task UpdatePostItem(Post item)
+    {
+        //item.Done = !item.Done;
+        await Http.PutAsJsonAsync<Post>($"{serverUrl}/api/posts/update", item);
+        await LoadPosts(); // Reload posts after update
+    }
+
+    private void FilterAndSort()
+    {
+        // Filter posts by name
+        var filteredPosts = postListCopy
+            .Where(post => string.IsNullOrWhiteSpace(nameFilter) || post.Name.Contains(nameFilter, StringComparison.OrdinalIgnoreCase));
+
+        // Filter posts by category
+        if (!string.IsNullOrEmpty(selectedCategory) && selectedCategory != "All")
+        {
+            filteredPosts = filteredPosts.Where(post => post.Category.Equals(selectedCategory, StringComparison.OrdinalIgnoreCase));
+        }
+
+        // Update filteredAndSortedPosts with the filtered posts
+        filteredAndSortedPosts = filteredPosts.ToArray();
+
+        // Sort filtered posts by name
+        filteredAndSortedPosts = filteredAndSortedPosts.OrderBy(post => post.Name).ToArray();
+
+
+    }
+
+
+    //modal herfra
+
+    private Post selectedPost; // Holds the selected post for modal display
+
+    // Method to open the modal with the details of the selected post
+    private void OpenModal(Post post)
+    {
+        Console.WriteLine("åbnet modal");
+        selectedPost = post;
+
+
+        // Additional logic to display the modal with the selected post details
+    }
+
+    private void CloseModal()
+    {
+        selectedPost = null;
+    }
+}

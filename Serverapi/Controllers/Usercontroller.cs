@@ -6,8 +6,7 @@ using Serverapi.Repositories;
 
 namespace Serverapi.Controllers
 {
-    public class Usercontroller
-    {
+   
 
         [ApiController]
         [Route("api/users")]
@@ -55,5 +54,5 @@ namespace Serverapi.Controllers
     }
 
 
-}
+
 
