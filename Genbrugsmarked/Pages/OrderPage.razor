@@ -1,0 +1,72 @@
+﻿@page "/orderpage"
+@using Core
+@inject HttpClient Http
+<PageTitle>Orders</PageTitle>
+
+<h1 class="mb-3 mt-3">Mine indkøb</h1>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Ordre ID</th>
+            <th>Bruger</th>
+           
+        </tr>
+    </thead>
+    <tbody>
+        @if (Orders != null && Orders.Any())
+        {
+            @foreach (var order in Orders)
+            {
+                <tr>
+                    <td>@order.Id</td>
+                    <td>@order.User</td>
+                    <td>
+                        <button class="btn btn-primary" @onclick="() => UpdateOrder(order)">Opdater</button>
+                        <button class="btn btn-danger" @onclick="() => DeleteOrder(order)">Slet</button>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="3">Ingen indkøb fundet.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    public string busyDisplayStyle { get; set; } = "none";
+    List<Order> Orders { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            busyDisplayStyle = "block"; // Tænd busy-indikatoren
+
+            // Forsøg at hente data fra API'en
+            Orders = await Http.GetFromJsonAsync<List<Order>>("https://localhost:7036/api/orders/getall");
+
+            busyDisplayStyle = "none"; // Sluk busy-indikatoren
+        }
+        catch (Exception ex)
+        {
+            // Håndter fejlen her, f.eks. log fejlmeddelelsen eller vis en fejlbesked til brugeren
+            Console.WriteLine($"Fejl ved hentning af ordrer: {ex.Message}");
+        }
+
+    }
+
+    private async Task UpdateOrder(Order order)
+    {
+        // Implementer opdateringslogik her, f.eks. navigering til en redigeringsformular.
+    }
+
+    private async Task DeleteOrder(Order order)
+    {
+        await Http.DeleteAsync($"https://localhost:7036/api/orders/delete/{order.Id}");
+        Orders.Remove(order);
+    }
+}

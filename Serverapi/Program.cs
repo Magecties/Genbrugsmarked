@@ -13,12 +13,21 @@ namespace Serverapi
             // Add services to the container.
 
             builder.Services.AddControllers();
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("policy",
+                                  policy =>
+                                  {
+                                      policy.AllowAnyOrigin();
+                                  });
+            });
 
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
 
             app.UseHttpsRedirection();
+            app.UseCors("policy");
 
             app.UseAuthorization();
 
@@ -37,11 +46,13 @@ namespace Serverapi
             var postrepository = new PostRepository();
 
             postrepository.AddPost(posttest);
-
+            
+            
             var ordertest = new Order
             {
                 User = "magnustest"
             };
+            
 
             var orderrepository = new Orderrepository();
 
