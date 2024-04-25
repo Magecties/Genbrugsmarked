@@ -34,7 +34,7 @@
     <tbody>
         @foreach (var item in filteredAndSortedPosts ?? new Post[0])
         {
-            <tr>
+            <tr style="cursor: pointer;" @onclick="() => OpenModal(item)">
                 <td>@item.Name</td>
                 <td>@item.Category</td>
                 <td>@item.Price</td>
@@ -51,6 +51,29 @@
                 </td>
             </tr>
         }
+
+        <!-- Modal -->
+        @if (selectedPost != null)
+        {
+            <div class="modal" style="display: block;">
+                <div class="modal-dialog">
+                    <!-- Add Bootstrap modal class -->
+                    <div class="modal-content">
+                        <span @onclick="CloseModal" class="close">&times;</span>
+                        <div class="modal-body">
+                            <h2>@selectedPost.Name</h2>
+                            <p>Category: @selectedPost.Category</p>
+                            <p>Price: @selectedPost.Price</p>
+                            <p>Status: @selectedPost.status</p>
+                            <!-- Add more details as needed -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+
+
     </tbody>
 </table>
 
@@ -110,6 +133,26 @@
         // Sort filtered posts by name
         filteredAndSortedPosts = filteredAndSortedPosts.OrderBy(post => post.Name).ToArray();
 
-        
+
+    }
+
+
+    //modal herfra
+
+    private Post selectedPost; // Holds the selected post for modal display
+
+    // Method to open the modal with the details of the selected post
+    private void OpenModal(Post post)
+    {
+        Console.WriteLine("åbnet modal");
+        selectedPost = post;
+
+
+        // Additional logic to display the modal with the selected post details
+    }
+
+    private void CloseModal()
+    {
+        selectedPost = null;
     }
 }
