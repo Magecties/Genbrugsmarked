@@ -26,13 +26,19 @@ namespace Serverapi.Controllers
                 return mRepo.GetAll();
             }
 
+        [HttpGet]
+        [Route("getbyemail/{email}")]
+        public List<Order> GetOrderByEmail(string email)
+        {
+            return mRepo.GetOrdersByEmail(email);
+        }
 
 
-            [HttpPost]
+        [HttpPost]
             [Route("add")]
-            public void AddItem(Order product)
+            public void AddItem(Order item)
             {
-                mRepo.AddItem(product);
+                mRepo.AddItem(item);
             }
 
             [HttpDelete]

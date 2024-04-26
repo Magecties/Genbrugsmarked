@@ -36,6 +36,12 @@ namespace Serverapi.repositories
 
         public void AddItem(Order item)
         {
+            var max = 0;
+            if (collection.Count(Builders<Order>.Filter.Empty) > 0)
+            {
+                max = collection.Find(Builders<Order>.Filter.Empty).SortByDescending(r => r.OrderId).Limit(1).ToList()[0].OrderId;
+            }
+            item.OrderId = max + 1;
             collection.InsertOne(item);
         }
 
@@ -53,6 +59,14 @@ namespace Serverapi.repositories
         {
             
         }
+
+        public List<Order> GetOrdersByEmail(string email)
+        {
+            var filter = Builders<Order>.Filter.Eq("User.user_email", email);
+
+            return collection.Find(filter).ToList();
+        }
+
 
         public void AddOrder(Order newOrder)
         {

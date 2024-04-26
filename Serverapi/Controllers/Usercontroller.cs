@@ -26,9 +26,16 @@ namespace Serverapi.Controllers
                 return mRepo.GetAll();
             }
 
+        [HttpGet]
+        [Route("checklogin")]
+        public bool CheckLogin([FromQuery] string email, [FromQuery] string password)
+        {
+            return mRepo.CheckLogin(email, password);
+        }
 
 
-            [HttpPost]
+
+        [HttpPost]
             [Route("add")]
             public void AddItem(User product)
             {

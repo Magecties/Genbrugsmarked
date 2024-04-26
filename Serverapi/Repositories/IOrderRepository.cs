@@ -13,6 +13,7 @@ namespace Serverapi.Repositories
 
         List<Order> GetAll();
 
+        List<Order> GetOrdersByEmail(string email);
 
         // Opdaterer element med Id = item.Id.
         void UpdateItem(Order item);

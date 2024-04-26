@@ -15,8 +15,8 @@ namespace Core
 
         public int OrderId { get; set; }
 
-        //lav om til public user user fordi den referencer til user dette er bare lavet for test
-        public string User { get; set; }
+        
+        public User User { get; set; }
 
         public List<Post> Posts { get; set; }
 

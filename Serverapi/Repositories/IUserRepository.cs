@@ -16,6 +16,11 @@ namespace Serverapi.Repositories
 
         // Opdaterer element med Id = item.Id.
         void UpdateItem(User item);
+
+
+        bool CheckLogin(string email, string password);
+
+        User GetBrugerByEmail(string email);
     }
 }
 

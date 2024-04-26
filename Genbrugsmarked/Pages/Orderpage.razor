@@ -1,70 +1,95 @@
 ﻿@page "/orderpage"
 @inject HttpClient Http
 @using Core
+@inject Blazored.LocalStorage.ILocalStorageService localstore
 @inject NavigationManager NavManager
 
 <h3>Order Page</h3>
 
-<h1 class="mb-3 mt-3">Shopping List</h1>
+<h1 class="mb-3 mt-3">Order list</h1>
+@if (login != true)
+{
+<p>Loginnuuuuuuu</p>
+<button @onclick="Loginside" class="mb-3 mt-3">Login</button>
+}else{
 <table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Amount</th>
-            <th>Price</th>
-            <th>Shop</th>
-            <th>Done</th>
-        </tr>
-    </thead>
+<thead>
+<tr>
+<th>Ordre</th>
+ 
+</tr>
+</thead>
     <tbody>
-        @foreach (var item in Orders ?? new Order[0])
+        @foreach (var order in orderlist)
         {
+            int i = 1;
             <tr>
-                <td>@item.User</td>
-                <td>@item.OrderId</td>
-                <td>
-                    @if (item.Posts != null)
-                    {
-                        @item
-                    }
-                    else
-                    {
-                        <span>N/A</span>
-                    }
-                </td>
-                <!-- Add other columns here as needed -->
+                <th>Odrer nr @i</th>
             </tr>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Room name</th>
+                <th>Description</th>
+            </tr>
+            postliste = order.Posts;
+            foreach (var item in postliste)
+            {
+                <tr>
+                    <td>@item.post_id</td>
+                    <td>@item.Name</td>
+                    <td>@item.Category</td>
+                    <td>@item.Price</td>
+                    <td>@item.Room.Name</td>
+                    <td>@item.Description</td>
+                </tr>
+            }
+            i++;
         }
-    </tbody>
-</table>
 
+    </tbody>
+    </table>
+}
 @code {
+
+    //Listen der holder på alle items
+    private List<Order> orderlist = new();
+    private List<Post> postliste = new();
+    private string email = "";
+    private Post post = new() { Name = "get, virker" };
+    private bool done = false;
+    private bool login;
+
     private string busyDisplayStyle = "none";
-    private Order[] Orders = new Order[0];
+  
     private string serverUrl = "https://localhost:7235";
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            busyDisplayStyle = "block";
-            Orders = await Http.GetFromJsonAsync<Order[]>($"{serverUrl}/api/orders/getall");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error fetching orders: {ex.Message}");
-        }
-        finally
-        {
-            busyDisplayStyle = "none";
-        }
+        
+            email = await localstore.GetItemAsStringAsync("user");
+            Console.WriteLine(email);
+
+            orderlist = await Http.GetFromJsonAsync<List<Order>>($"{serverUrl}/api/orders/getbyemail/{email}");
+
+            var response = await Http.PostAsJsonAsync<Post>($"{serverUrl}/api/posts/add", post);
+
+            var result = await response.Content.ReadAsStringAsync();
+
+            login = await localstore.GetItemAsync<bool>("login");
+
+
+
+       
     }
 
-    private async Task DeleteOrderItem(Order item)
+    private void Loginside()
     {
-        await Http.DeleteAsync($"{serverUrl}/api/orders/delete/{item.Id}");
-        Orders = await Http.GetFromJsonAsync<Order[]>($"{serverUrl}/api/orders/getall");
+        NavManager.NavigateTo("login", true);
     }
+
 
     private async Task UpdateOrderItem(Order item)
     {

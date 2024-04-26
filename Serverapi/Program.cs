@@ -45,41 +45,45 @@ namespace Serverapi
             app.UseCors("policy");
             app.MapControllers();
 
-            
-            //test og indsætte rooms og posts til data at arbejde med udkommenter alt fra her til inden app.run
-            var newroom = new Room() { Name = "rygerummet", roomid = 1337};
+
+            /*
+			//test og indsætte rooms og posts til data at arbejde med udkommenter alt fra her til inden app.run
+			var newroom = new Room() { Name = "rygerummet", roomid = 1337, LokaleNr = "10"};
             var roomrepo = new RoomRepository();
             roomrepo.AddRoom(newroom);
 
-            /*
+            
             var posttest = new Post
             {
-                Category = "books",
-                Name = "childbook1",
-                Price = 100,
+                Category = "Clothing",
+                Name = "tshirt",
+                Price = 10,
                 status = "active",
                 Room = newroom,
-                Description = "big fat children book for children maybe not adults",
+                Description = "soooooo cooooool shirt",
                 img = ""
                 
             };
            
 
-
+            
             var postrepository = new PostRepository();
 
-            postrepository.AddPost(posttest);
-
+            postrepository.AddItem(posttest);
+            /*
             var newuser = new User() {Name = "jannefestival", user_email = "jannefestival@gamrmail.dk" };
             var userreoi = new UserRepository();
             userreoi.AddUser(newuser);
 
-             */
-
+             
+            /*
+            var newuser = new User() { Name = "supermganususer", user_email = "email123", password = "password"};
+            var userreop = new UserRepository();
+            userreop.AddUser(newuser);
 
             var newOrder = new Order
             {
-                User = "supermagnus",
+                User = newuser,
                 OrderId = 1337,
                 Posts = new List<Post>
     {
@@ -94,12 +98,13 @@ namespace Serverapi
                 Console.WriteLine(post); // Or any other property you want to display
                 var newposttilpostlisetnwtfdetherermegalang = new PostRepository();
                 newposttilpostlisetnwtfdetherermegalang.AddPost(post);
+
             }
 
             var newordertest = new Orderrepository();
             newordertest.AddOrder(newOrder);
 
-
+            */
             app.Run();
         }
     }

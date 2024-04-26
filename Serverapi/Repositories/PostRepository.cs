@@ -21,13 +21,6 @@ namespace Serverapi.repositories
 
         IMongoCollection<Post> collection;
 
-        //post list burde fjernes senere
-        private List<Post> postlisten = new() {
-                  new Post { Category = "post1", Name = "banan", Price = 142, status = "testst"  },
-                  new Post { Category = "post2", Name = "Æbler", Price = 14, status = "testst"  }
-        };
-
-
         public PostRepository()
         {
 
@@ -42,32 +35,40 @@ namespace Serverapi.repositories
         // alt under udover addpost er inmemory funktionalitet
         public void AddItem(Post item)
         {
-            int newId = postlisten.Select(x => x.post_id).Max() + 1;
-            item.post_id = newId;
-            postlisten.Add(item);
+            var max = 0;
+            if (collection.Count(Builders<Post>.Filter.Empty) > 0)
+            {
+                max = collection.Find(Builders<Post>.Filter.Empty).SortByDescending(r => r.post_id).Limit(1).ToList()[0].post_id;
+            }
+            item.post_id = max + 1;
+            collection.InsertOne(item);
         }
-
         public void DeleteById(int id)
         {
-            postlisten.RemoveAll((item) => item.post_id == id);
+            collection.DeleteOne(post => post.post_id == id);
         }
 
         public List<Post> GetAll()
         {
-            return collection.Find(Builders<Post>.Filter.Empty).ToList();
+            return collection.Find(_ => true).ToList();
         }
 
-        public void UpdateItem(Post item)
+
+
+		public List<Post> GetPostsByEmail(string email)
+		{
+			var filter = Builders<Post>.Filter.Eq("User.user_email", email);
+
+			return collection.Find(filter).ToList();
+		}
+
+		public void UpdateItem(int id, Post item)
         {
-            DeleteById(item.post_id);
-            postlisten.Add(item);
-        }
-
-
-        public void AddPost(Post newpost)
-        {
-            collection.InsertOne(newpost);
-        }
+			var filter = Builders<Post>.Filter.Eq(s => s.post_id, id);
+			var update = Builders<Post>.Update
+						.Set(s => s.status, item.status );
+			collection.UpdateOne(filter, update);
+		}
 
     }
 }

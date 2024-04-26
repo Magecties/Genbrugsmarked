@@ -12,6 +12,8 @@ namespace Core
 
         public int roomid { get; set; }
         public string Name { get; set; }
-        
-    }
+
+		public string LokaleNr { get; set; } = "";
+
+	}
 }

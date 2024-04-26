@@ -53,11 +53,11 @@
         }
 
         <!-- Modal -->
-        @if (selectedPost != null)
+        @if (selectedPost != null && selectedPost.status == "active")
         {
             <div class="modal" style="display: block;">
                 <div class="modal-dialog">
-                    <!-- Add Bootstrap modal class -->
+                  
                     <div class="modal-content">
                         <span @onclick="CloseModal" class="close">&times;</span>
                         <div class="modal-body">
@@ -66,8 +66,8 @@
                             <p>Price: @selectedPost.Price</p>
                             <p>Status: @selectedPost.status</p>
                             <p>Description: @selectedPost.Description</p>
-                            <p>Image of post: @selectedPost.img</p>
-                            <img src="images/@selectedPost.img" alt="Image of post" />
+                            <p><img src="@selectedPost.img"/></p>
+                            <button @onclick="()=>TilføjTilListe(ordreListe, selectedPost)" class="btn btn-primary">Add</button>
 
                            
                            
@@ -85,13 +85,13 @@
 <img src="busy.gif" style="display:@busyDisplayStyle" />
 
 @code {
-
+    List<Post> ordreListe = new();
     private string busyDisplayStyle = "none";
     private Post[] postListCopy; // Copy of the original post list
     private Post[] filteredAndSortedPosts = new Post[0]; // Filtered and sorted posts
     private string nameFilter = "";
     private string selectedCategory = "";
-
+    Order order = new();
     private string serverUrl = "https://localhost:7235";
 
     protected override async Task OnInitializedAsync()
@@ -99,6 +99,10 @@
         busyDisplayStyle = "block";
         await LoadPosts(); // Load posts initially
         busyDisplayStyle = "none";
+
+        bros = brugerListe.ToList();
+
+        mainBruger = GetBrugerByEmail(brugerEmail);
     }
 
     private async Task LoadPosts()
@@ -161,4 +165,49 @@
     {
         selectedPost = null;
     }
+
+
+    private void TilføjTilListe(List<Post> liste, Post post)
+    {
+        Console.WriteLine($"{post.Name}  was Added");
+        liste.Add(post);
+        post.status = "Inaktiv";
+
+    }
+
+    public async Task LavBestilling(List<Post> liste)
+    {
+
+        //Laver en ny ordrer instans:
+        order = new Order
+            {
+                User = GetBrugerByEmail(brugerEmail),
+                Posts = liste
+            };
+       
+
+        await Http.PostAsJsonAsync<Order>($"{serverUrl}/api/orders/add", order);
+
+
+    }
+
+private User[]? brugerListe = new User[0];
+List<User> bros = new();
+string brugerEmail = "";
+User mainBruger = new();
+ 
+private User GetBrugerByEmail(string email)
+{
+ 
+    foreach (var user in bros)
+    {
+        if (user.user_email == brugerEmail)
+        {
+            mainBruger = user;
+        }
+    }
+    Console.WriteLine($"Brugeren {mainBruger.user_email} ");
+    return mainBruger;
+ 
+}
 }

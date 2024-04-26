@@ -63,6 +63,31 @@ namespace Serverapi.repositories
             collection.InsertOne(newuser);
         }
 
+
+        public User GetBrugerByEmail(string email)
+        {
+
+            return collection.Find(x => x.user_email == email).FirstOrDefault();
+        }
+
+        public bool CheckLogin(string email, string password)
+        {
+            User user = new();
+            var filter1 = Builders<User>.Filter.Eq("user_email", email);
+            var filter2 = Builders<User>.Filter.Eq("password", password);
+
+            user = collection.Aggregate().Match(filter1).Match(filter2).FirstOrDefault();
+            Console.WriteLine(user);
+            if (user != null && user.user_email == email && user.password == password)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+                
+            }
+        }
     }
 }
 

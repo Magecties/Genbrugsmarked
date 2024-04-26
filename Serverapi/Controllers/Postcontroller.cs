@@ -26,6 +26,13 @@ namespace Serverapi.Controllers
                 return mRepo.GetAll();
             }
 
+        [HttpGet]
+        [Route("getbyemail/{email}")]
+        public List<Post> GetPostsByEmail(string email)
+        {
+            return mRepo.GetPostsByEmail(email);
+        }
+
 
 
             [HttpPost]
@@ -44,9 +51,9 @@ namespace Serverapi.Controllers
 
             [HttpPut]
             [Route("update")]
-            public void UpdateItem(Post product)
+            public void UpdateItem(int id, Post product)
             {
-                mRepo.UpdateItem(product);
+                mRepo.UpdateItem(id, product);
             }
 
 

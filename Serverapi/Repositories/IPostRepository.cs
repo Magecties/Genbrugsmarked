@@ -15,9 +15,11 @@ namespace Serverapi.Repositories
 
         List<Post> GetAll();
 
+		List<Post> GetPostsByEmail(string email);
 
-        // Opdaterer element med Id = item.Id.
-        void UpdateItem(Post item);
+         void UpdateItem(int id, Post item);
+
+		
     }
 }
 

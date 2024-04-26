@@ -22,5 +22,7 @@ namespace Core
         public string Description { get; set; }
 
         public string img {  get; set; }
+
+        public User User {  get; set; }
     }
 }

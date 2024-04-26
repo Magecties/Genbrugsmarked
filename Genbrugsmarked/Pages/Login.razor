@@ -1,0 +1,103 @@
+﻿@using Core;
+@page "/login"
+@inject HttpClient Http;
+@inject Blazored.LocalStorage.ILocalStorageService localstore;
+@inject NavigationManager navManager;
+
+@if (login == false)
+{
+    <h>Login</h>
+    <EditForm EditContext="@aEditContext" OnSubmit="@handleSubmit" class="row p-3">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        @if (popUp == true)
+        {
+            <div style="color: red">wrong email or password</div>
+        }
+
+        <div class="col-md-12 mb-3">
+            <label for="Email">Email</label>
+            <InputText id="Email" @bind-Value="user.user_email" class=form-control></InputText>
+        </div>
+
+
+        <div class="col-md-12 mb-3">
+            <label for="Password">Password</label>
+            <InputText id="Password" @bind-Value="user.password" class=form-control></InputText>
+        </div>
+
+
+        <div class="col-12 mb-3">
+            <button @type="submit" class="btn btn-primary">Login</button>
+        </div>
+
+
+    </EditForm>
+}
+@if (login == true)
+{
+    <button @onclick="ClearStorage" class="col-12 mb-3">Log ud</button>
+}
+
+@code {
+    private EditContext aEditContext;
+
+    public static User user = new();
+
+    public bool erLoggetInd = false;
+
+    bool popUp = false;
+
+    private string serverUrl = "https://localhost:7235";
+
+
+    private bool login;
+
+    protected override void OnInitialized() => aEditContext = new EditContext(user);
+
+    protected override async Task OnInitializedAsync()
+    {
+        login = await localstore.GetItemAsync<bool>("login");
+    }
+    public async Task handleSubmit()
+    {
+        
+            string email = user.user_email;
+            string password = user.password;
+
+            erLoggetInd = await Http.GetFromJsonAsync<bool>($"{serverUrl}/api/users/checklogin?email={email}&password={password}");
+
+            Console.WriteLine("erlogget ind:" + erLoggetInd);
+            Console.WriteLine(erLoggetInd);
+
+            if (erLoggetInd == false)
+            {
+                popUp = true;
+            }
+            else
+            {
+                Save("user", email);
+                popUp = false;
+                navManager.NavigateTo("login", true);
+                saveloggedind();
+            }
+        
+    }
+
+    private async void Save(string key, string item)
+    {
+        await localstore.SetItemAsStringAsync(key, item);
+    }
+
+    private async void saveloggedind()
+    {
+        await localstore.SetItemAsync<bool>("login", erLoggetInd);
+    }
+
+    protected async Task ClearStorage()
+    {
+        await localstore.ClearAsync();
+        navManager.NavigateTo("login", true);
+    }
+}

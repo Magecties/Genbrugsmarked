@@ -1,0 +1,360 @@
+﻿@page "/Myprofile"
+@using Core
+@using Genbrugsmarked.layout
+@inject HttpClient Http;
+@inject Blazored.LocalStorage.ILocalStorageService localstore
+@inject NavigationManager navManager
+@inject IJSRuntime js
+ 
+<h3>My profile</h3>
+@if (login != true)
+{
+<p>Login pls</p>
+<button @onclick="Loginside" class="mb-3 mt-3">Login</button>
+}else{
+<h1 class="mb-3 mt-3">Add post</h1>
+ 
+<EditForm EditContext="@aEditContext" OnSubmit="@handleSubmit" class="row p-3">
+<DataAnnotationsValidator />
+<ValidationSummary />
+	<div class="col-md-12 mb-3">
+<label for="Titel">Name</label>
+<InputText id="Titel" @bind-Value="post.Name" class="form-control" />
+</div>
+<div class="col-md-12 mb-3">
+<label for="Beskrivelse">Description</label>
+<InputText id="Beskrivelse" @bind-Value="post.Description" class="form-control" />
+</div>
+ 
+		<div class="col-md-12 mb-3">
+<label for="Billede">Upload png/jpg</label>
+<InputFile id="Billede" class="form-control" OnChange="OnFileChange"/>
+</div>
+ 
+	<div class="col-md-12 mb-3">
+<label for="Pris">Price</label>
+<InputNumber id="Pris" @bind-Value="post.Price" class="form-control" />
+</div>
+<div class="col-md-12 mb-3">
+<label for="Kategori">Category</label>
+<InputSelect id="Kategori" @bind-Value="post.Category" class="form-control" >
+ 
+		@foreach (string anOption in kategorier)
+		{
+<option value="@anOption">@anOption</option>
+ 
+		}
+</InputSelect>
+</div>
+ 
+<div class="col-md-12 mb-3">
+<label for="Lokale">Room number</label>
+<InputNumber id="Lokale" @bind-Value="lokationID" class="form-control" />
+		</div>
+	<div class="col-12 mb-3">
+<button @type="submit" class="btn btn-primary">Tilføj</button>
+</div>
+ 
+	<h4>@fejlBesked</h4>
+ 
+	</EditForm>
+<ModalDialog @ref="@addDialog" Title="See more details">
+<EditForm EditContext="@bEditContext" OnSubmit="@handleSubmitChange" class="row p-3">
+<DataAnnotationsValidator />
+<ValidationSummary />
+ 
+<div class="col-md-12 mb-3">
+<label for="Vare">Name</label>
+<InputText id="Vare" @bind-Value="redigeretAnnonce.Name" class="form-control" />
+</div>
+<div class="col-md-12 mb-3">
+<label for="Beskrivelse">Beskrivelse</label>
+<InputText id="Description" @bind-Value="redigeretAnnonce.Description" class="form-control" />
+</div>
+ 
+			<div class="col-md-12 mb-3">
+<label for="Pris">Price</label>
+<InputNumber id="Pris" @bind-Value="redigeretAnnonce.Price" class="form-control" />
+</div>
+<div class="col-md-12 mb-3">
+<label for="Kategori">Category</label>
+<InputSelect id="Kategori" @bind-Value="redigeretAnnonce.Category" class="form-control">
+ 
+					@foreach (string anOption in kategorier)
+					{
+<option value="@anOption">@anOption</option>
+ 
+					}
+</InputSelect>
+ 
+			</div>
+ <div class="col-md-12 mb-3">
+<label for="Lokale">Room number</label>
+<InputNumber id="Lokale" @bind-Value="lokationID" class="form-control" />
+</div>
+
+			<div class="col-12 mb-3">
+<button @type="submit" class="btn btn-primary">Tilføj</button>
+</div>
+ 
+			<h4>@fejlBesked</h4>
+ 
+		</EditForm>
+</ModalDialog>
+<table class="table table-striped">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Price</th>
+<th>Category</th>
+<th>Room</th>
+</tr>
+</thead>
+<tbody>
+			@foreach (var item in BrugerSamlingAfAnnoncer)
+			{
+				@if (item.status == "active")
+				{
+<tr>
+<td>@item.Name</td>
+<td>@item.Description</td>
+<td>@item.Price</td>
+<td>@item.Category</td>
+<td>@item.Room.roomid</td>
+<button @onclick="()=>SletAnnonce(item)" class="btn btn-primary">Slet</button>
+ 
+					</tr>
+				}
+ 
+			}
+ 
+		</tbody>
+</table>
+}
+
+@code {
+	Post post = new();
+	private int annonceID = 1;
+	private string fejlBesked = "";
+	int i = 1;
+	int lokationID; //Vigtig
+					//public List<IBrowserFile> fpath = new();
+	public string? fpath;
+	//Katogrier til dropdown menu
+	private string[] kategorier = { "Clothing", "Books", "It-Equipment" };
+
+	//For at få overblik annoncer i koden
+	List<Post> Listofposts = new();
+
+	//Listen der holder på alle items
+	private Room[]? lokationListe = new Room[0];
+	List<Room> lolo = new();
+
+	//Link til serveren:
+	private string serverUrl = "https://localhost:7235";
+
+	//Liste der holder på alle annoncer som den specifikke bruger har
+	private List<Post> BrugerSamlingAfAnnoncer = new();
+
+	//Bruger er hardcoded den skal fjernes:
+	User mainUser = new();
+
+	private string brugerEmail = "";
+
+
+	private bool login;
+
+	private EditContext? aEditContext;
+	private EditContext? bEditContext;
+
+
+	//Unødvendig kompliceret måde at få en bruger
+	//Listen der holder på  bruger
+
+	private User[]? brugerListe = new User[0];
+	List<User> bros = new();
+
+	Post redigeretAnnonce = new();
+
+
+	private Post selectedAnnonce = new Post();
+
+	public void SetSelectedAnnonce(Post post)
+	{
+		selectedAnnonce = redigeretAnnonce;
+	}
+
+
+	public void åbenModal(Post post)
+	{
+		addDialog.Open();
+		SetSelectedAnnonce(post);
+		bEditContext = new EditContext(post);
+
+	}
+
+
+	private User GetBrugerByEmail(string email)
+	{
+		foreach (var user in bros)
+		{
+			if (user.user_email == brugerEmail)
+			{
+				mainUser = user;
+			}
+		}
+		Console.WriteLine($"Brugeren {mainUser.user_email} ");
+		return mainUser;
+
+	}
+
+
+	protected override async Task OnInitializedAsync()
+	{
+		login = await localstore.GetItemAsync<bool>("login");
+
+		//Her får vi fat i brugeres email
+		brugerEmail = await localstore.GetItemAsStringAsync("user");
+		Console.WriteLine(brugerEmail);
+
+
+		//Henter alle lokationer:
+		lokationListe = await Http.GetFromJsonAsync<Room[]>($"{serverUrl}/api/rooms/getall");
+		//Henter alle lokationer:
+		lolo = lokationListe.ToList();
+
+
+		//Henter alle bruger
+		brugerListe = await Http.GetFromJsonAsync<User[]>($"{serverUrl}/api/users/getall");
+		//Henter alle bruger
+		bros = brugerListe.ToList();
+		mainUser = GetBrugerByEmail(brugerEmail);
+
+		BrugerSamlingAfAnnoncer = await Http.GetFromJsonAsync<List<Post>>($"{serverUrl}/api/posts/getbyemail/{brugerEmail}");
+	}
+
+	protected override void OnInitialized()
+	{
+		aEditContext = new EditContext(post);
+		bEditContext = new EditContext(redigeretAnnonce);
+
+
+	}
+
+	private async Task SletAnnonce(Post annonce)
+	{
+		string requestUrl = $"{serverUrl}/api/posts/delete/{annonce.post_id}";
+		//await Http.PutAsJsonAsync<Annoncer>(requestUrl, annonce);
+		await Http.DeleteAsync(requestUrl);
+		//await Http.DeleteFromJsonAsync<Annoncer>(requestUrl);
+
+		BrugerSamlingAfAnnoncer = await Http.GetFromJsonAsync<List<Post>>($"{serverUrl}/api/posts/getbyemail/{brugerEmail}");
+
+
+	}
+
+	private Room FindLokationMed_ID(int id)
+	{
+		//Til når vi finder lokation
+		Room fundetLokation = new();
+
+		foreach (var lokation in lokationListe)
+		{
+			//Tjekker hvert ID igennem for at se om det passer med bruger input
+			if (lokation.roomid == id)
+			{
+				fundetLokation = lokation;
+				Console.WriteLine("Found lokation");
+			}
+		}
+		return fundetLokation;
+
+	}
+
+	public async Task handleSubmit()
+	{
+		if (aEditContext.Validate())
+		{
+			/*
+			fpath = annonce.Billede;
+			annonce.Billede = BilledeConverter(fpath);
+			*/
+			//Lokationen bliver valgt her
+			post.Room = FindLokationMed_ID(lokationID);
+
+			post.User = mainUser;
+
+			post.status = "active";
+			post.Room.Name = "testroom";
+			await Http.PostAsJsonAsync<Post>($"{serverUrl}/api/posts/add", post);
+
+
+			fejlBesked = $"Annoncen {post.Name} er blevet oprettet";
+			BrugerSamlingAfAnnoncer = await Http.GetFromJsonAsync<List<Post>>($"{serverUrl}/api/posts/getbyemail/{brugerEmail}");
+
+			post = new();
+
+
+
+		}
+		else
+		{
+			fejlBesked = "Form is Invalid: Error";
+		}
+	}
+
+
+	public async Task handleSubmitChange()
+	{
+		if (bEditContext.Validate())
+		{
+
+
+			string requestUrl = $"{serverUrl}/api/posts/updateAnnonce/{redigeretAnnonce}";
+			await Http.PutAsJsonAsync<Post>(requestUrl, redigeretAnnonce);
+
+
+
+			fejlBesked = $"Annoncen {post.Name} er blevet opdateret";
+			post = new();
+
+		}
+		else
+		{
+			fejlBesked = "Form is Invalid: Error";
+		}
+	}
+
+	private void Loginside()
+	{
+		navManager.NavigateTo("login", true);
+	}
+
+
+
+	async Task OnFileChange(InputFileChangeEventArgs e)
+	{
+		if (e.File.Name.Contains(".png"))
+		{
+			var format = "image/png";
+			var resizeimage = await e.File.RequestImageFileAsync(format, 200, 600);
+			var buffer = new byte[resizeimage.Size];
+			await resizeimage.OpenReadStream().ReadAsync(buffer);
+			var imageData = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+			post.img = imageData;
+		}
+		else if (e.File.Name.Contains(".jpg"))
+		{
+			var format = "image/jpg";
+			var resizeimage = await e.File.RequestImageFileAsync(format, 200, 600);
+			var buffer = new byte[resizeimage.Size];
+			await resizeimage.OpenReadStream().ReadAsync(buffer);
+			var imageData = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+			post.img = imageData;
+		}
+		else await js.InvokeVoidAsync("alert", "Forkert fil format");
+
+	}
+	private ModalDialog? addDialog { get; set; }
+} 
